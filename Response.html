@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Online Response Form (Multiple Entries with Preview)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .entry-set {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .entry-set > .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+      display: none;
+    }
+    .entry-set:not(:first-child) > .remove-btn {
+      display: block;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 7px;
+      margin-top: 3px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+    .add-btn, button[type="submit"], button#previewBtn, button#editBtn, button#finalSubmitBtn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 1em;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .add-btn {
+      background-color: #28a745;
+    }
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    hr {
+      margin: 25px 0 10px 0;
+      border: none;
+      border-top: 1px solid #eee;
+    }
+    #previewSection {
+      display: none;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+    }
+    #previewTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    #previewTable th, #previewTable td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+      font-size: 0.9em;
+    }
+    #previewTable th {
+      background-color: #f0f0f0;
+    }
+    .button-group {
+      text-align: right;
+    }
+    .button-group button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Online Response Form</h2>
+
+  <form id="multiResponseForm">
+    <div id="entrySets"></div>
+    <button type="button" class="add-btn" id="addEntryBtn">+ Add Another Entry</button>
+    <br />
+    <button type="button" id="previewBtn">Preview</button>
+  </form>
+
+  <div id="previewSection">
+    <h3>Preview Your Responses</h3>
+    <table id="previewTable" aria-label="Preview of responses">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Subject</th>
+          <th>Type</th>
+          <th>Credits</th>
+          <th>Total Class Monthly</th>
+          <th>Total Class Taken</th>
+          <th>Reason</th>
+          <th>Recovery Step</th>
+          <th>Month</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="button-group">
+      <button type="button" id="editBtn">Edit</button>
+      <button type="button" id="finalSubmitBtn">Submit All</button>
+    </div>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <template id="entryTemplate">
+    <div class="entry-set">
+      <button type="button" class="remove-btn" aria-label="Remove this entry">Remove</button>
+      <label>Name *</label>
+      <input type="text" name="Name" required />
+
+      <label>Subject *</label>
+      <input type="text" name="Subject" required />
+
+      <label>Type *</label>
+      <select name="Type" required>
+        <option value="" disabled selected>Select type</option>
+        <option value="Lecture">Lecture</option>
+        <option value="Lab">Lab</option>
+        <option value="Seminar">Seminar</option>
+        <option value="Tutorial">Tutorial</option>
+      </select>
+
+      <label>Credits *</label>
+      <input type="number" name="Credits" min="0" required />
+
+      <label>Total Class Monthly *</label>
+      <input type="number" name="TotalClassMonthly" min="0" required />
+
+      <label>Total Class Taken *</label>
+      <input type="number" name="TotalClassTaken" min="0" required />
+
+      <label>Reason</label>
+      <textarea name="Reason"></textarea>
+
+      <label>Recovery Step</label>
+      <textarea name="RecoveryStep"></textarea>
+
+      <label>Month *</label>
+      <select name="Month" required>
+        <option value="" disabled selected>Select month</option>
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+      </select>
+    </div>
+  </template>
+
+  <script>
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbysQcvxXJHWN0WQCdy-qS76sdzq53lcjzMKGqZ1Is8P_cRgdL1obBTppKQWgaZ_SvW9/exec';
+    const entrySetsDiv = document.getElementById('entrySets');
+    const addEntryBtn = document.getElementById('addEntryBtn');
+    const form = document.getElementById('multiResponseForm');
+    const messageDiv = document.getElementById('message');
+    const entryTemplate = document.getElementById('entryTemplate');
+
+    const previewSection = document.getElementById('previewSection');
+    const previewTableBody = previewSection.querySelector('tbody');
+    const previewBtn = document.getElementById('previewBtn');
+    const editBtn = document.getElementById('editBtn');
+    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
+
+    // Add a new entry set
+    function addEntrySet() {
+      const clone = entryTemplate.content.cloneNode(true);
+      const entrySet = clone.querySelector('.entry-set');
+      // Remove button functionality
+      const removeBtn = entrySet.querySelector('.remove-btn');
+      removeBtn.onclick = function () {
+        entrySet.remove();
+      };
+      entrySetsDiv.appendChild(clone);
+    }
+
+    // Add initial entry set
+    addEntrySet();
+
+    addEntryBtn.onclick = addEntrySet;
+
+    // Gather all entry sets into an array of objects
+    function gatherResponses() {
+      const entryDivs = entrySetsDiv.querySelectorAll('.entry-set');
+      let responses = [];
+      let valid = true;
+
+      entryDivs.forEach((div) => {
+        const getVal = (name) => div.querySelector(`[name="${name}"]`).value.trim();
+        // Validate required fields
+        ['Name', 'Subject', 'Type', 'Credits', 'TotalClassMonthly', 'TotalClassTaken', 'Month'].forEach(
+          (field) => {
+            if (!getVal(field)) valid = false;
+          }
+        );
+        responses.push({
+          Name: getVal('Name'),
+          Subject: getVal('Subject'),
+          Type: getVal('Type'),
+          Credits: getVal('Credits'),
+          TotalClassMonthly: getVal('TotalClassMonthly'),
+          TotalClassTaken: getVal('TotalClassTaken'),
+          Reason: getVal('Reason'),
+          RecoveryStep: getVal('RecoveryStep'),
+          Month: getVal('Month'),
+        });
+      });
+
+      return { responses, valid };
+    }
+
+    // Render preview table rows
+    function renderPreviewTable(responses) {
+      previewTableBody.innerHTML = '';
+      responses.forEach((entry) => {
+        const row = document.createElement('tr');
+        for (const key of [
+          'Name',
+          'Subject',
+          'Type',
+          'Credits',
+          'TotalClassMonthly',
+          'TotalClassTaken',
+          'Reason',
+          'RecoveryStep',
+          'Month',
+        ]) {
+          const cell = document.createElement('td');
+          cell.textContent = entry[key] || '';
+          row.appendChild(cell);
+        }
+        previewTableBody.appendChild(row);
+      });
+    }
+
+    // Show preview section and hide form
+    function showPreview() {
+      const { responses, valid } = gatherResponses();
+      if (!valid) {
+        messageDiv.textContent = 'Please fill all required fields in all entries before preview.';
+        messageDiv.className = 'message error';
+        return;
+      }
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+      renderPreviewTable(responses);
+      form.style.display = 'none';
+      previewSection.style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    // Show form and hide preview
+    function showForm() {
+      previewSection.style.display = 'none';
+      form.style.display = 'block';
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+      window.scrollTo(0, 0);
+    }
+
+    // Submit data to backend
+    function submitData(responses) {
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+
+      // Disable buttons during submission
+      finalSubmitBtn.disabled = true;
+      editBtn.disabled = true;
+      addEntryBtn.disabled = true;
+      previewBtn.disabled = true;
+
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify({ responses }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result === 'success') {
+            messageDiv.textContent = 'All entries submitted successfully!';
+            messageDiv.className = 'message success';
+            // Reset form
+            entrySetsDiv.innerHTML = '';
+            addEntrySet();
+            showForm();
+          } else {
+            throw new Error(data.message || 'Unknown error');
+          }
+        })
+        .catch((error) => {
+          messageDiv.textContent = 'Error submitting form: ' + error.message;
+          messageDiv.className = 'message error';
+        })
+        .finally(() => {
+          finalSubmitBtn.disabled = false;
+          editBtn.disabled = false;
+          addEntryBtn.disabled = false;
+          previewBtn.disabled = false;
+        });
+    }
+
+    // Event Listeners
+    previewBtn.addEventListener('click', showPreview);
+    editBtn.addEventListener('click', showForm);
+    finalSubmitBtn.addEventListener('click', () => {
+      const { responses } = gatherResponses();
+      submitData(responses);
+    });
+  </script>
+</body>
+</html>
